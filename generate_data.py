@@ -4,6 +4,7 @@ from mcerp import stats
 
 import numpy as np
 from scipy import stats as stats
+import torch
 
 target_corr = [
     [1, 0.2, 0.2, 0.2, 0.2, 0.8],
@@ -15,7 +16,7 @@ target_corr = [
 ]
 
 
-def generate_data():
+def generate_data(device):
     v1 = N(0, 1)
     v2 = N(0, 1)
     v3 = N(0, 1)
@@ -33,4 +34,9 @@ def generate_data():
     data = np.vstack((rv1, rv2, rv3, rv4, rv5, rv6)).T
     labels = data[:, -1]  # for last column
     inp_data = data[:, :-1]  # for all but last column
+    inp_data = torch.from_numpy(inp_data).float()
+    labels = torch.from_numpy(labels).float().unsqueeze(1)
+    if device=='cuda':
+        inp_data=inp_data.cuda()
+        labels=labels.cuda()
     return inp_data, labels

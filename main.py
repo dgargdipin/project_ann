@@ -1,22 +1,18 @@
 import os
 import torch.nn as nn
 import torch
-import matplotlib.pyplot as plt
 from model import ANNModel
 from generate_data import generate_data
-import time
+from weights import connection_weight,garsons
+from plots import save_losses
 
 INPUT_DIM = 5
 HIDDEN_DIM = 5
 OUTPUT_DIM = 1
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cpu"
 
-inp_data_np, labels_np = generate_data()
-
-inp_data = torch.from_numpy(inp_data_np).float().cuda()
-
-labels = torch.from_numpy(labels_np).float().unsqueeze(1).cuda()
-
+inp_data, labels = generate_data(DEVICE)
 
 net = ANNModel(INPUT_DIM, HIDDEN_DIM, OUTPUT_DIM, nn.ReLU)
 net = net.to(DEVICE)
@@ -27,7 +23,7 @@ optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
 
 
 loss_list = []
-iteration_number = 1001
+iteration_number = 10
 for iteration in range(iteration_number):
     # optimization
     optimizer.zero_grad()
@@ -52,11 +48,4 @@ for iteration in range(iteration_number):
         print("epoch {}, loss {}".format(iteration, loss.data))
 
 
-if not os.path.exists('plots'):
-    os.makedirs('plots')
-
-import matplotlib
-matplotlib.use('Agg')
-plt.plot(range(iteration_number), loss_list)
-timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
-plt.savefig(os.path.join('plots',timestr+'.png'))
+print(garsons(net))
