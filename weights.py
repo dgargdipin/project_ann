@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 def connection_weight(model):
@@ -19,5 +20,23 @@ def garsons(model):
     hl_mod_weights = np.abs(hidden_layer_weights)
     col_sums = np.sum(hl_mod_weights, axis=0).reshape(1, -1)
     Q_arr = hl_mod_weights / col_sums
-    Q_sum=np.sum(Q_arr)
-    return np.sum(Q_arr,axis=1)*100/Q_sum
+    Q_sum = np.sum(Q_arr)
+    return np.sum(Q_arr, axis=1) * 100 / Q_sum
+
+
+def perturbation(model, input_data, labels, error):
+    model.eval()
+    input_dim = model.hidden_layer.in_features
+    ans = []
+    with torch.no_grad():
+        for i in range(input_dim):
+            noise = np.random.normal(0, 1, 10000) * 0.5
+            inp_copy = input_data.numpy().copy().T
+            inp_copy[i] += noise
+            altered_inp = torch.from_numpy(inp_copy.T)
+            results_init = model(input_data)
+            loss_init = error(results_init, labels)
+            results_final = model(altered_inp)
+            loss_final = error(results_final, labels)
+            ans.append((loss_final - loss_init).numpy())
+    return ans

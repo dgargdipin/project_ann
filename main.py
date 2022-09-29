@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch
 from model import ANNModel
 from generate_data import generate_data
-from weights import connection_weight,garsons
+from weights import connection_weight, garsons, perturbation
 from plots import save_losses
 
 INPUT_DIM = 5
@@ -23,7 +23,7 @@ optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
 
 
 loss_list = []
-iteration_number = 10
+iteration_number = 1000
 for iteration in range(iteration_number):
     # optimization
     optimizer.zero_grad()
@@ -48,4 +48,4 @@ for iteration in range(iteration_number):
         print("epoch {}, loss {}".format(iteration, loss.data))
 
 
-print(garsons(net))
+print(perturbation(net, input_data=inp_data, labels=labels, error=error))
