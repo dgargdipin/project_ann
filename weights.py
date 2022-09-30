@@ -11,7 +11,7 @@ def connection_weight(model):
         for j in range(hidden_dim):
             curr_sum += hidden_layer_weights[i][j] * output_layer_weights[j][0]
         connection_weights.append(curr_sum)
-    return connection_weights
+    return np.array(connection_weights)
 
 
 def garsons(model):
@@ -30,7 +30,7 @@ def perturbation(model, input_data, labels, error):
     ans = []
     with torch.no_grad():
         for i in range(input_dim):
-            noise = np.random.normal(0, 1, 10000) * 0.5
+            noise = np.random.normal(0, 1, input_data.shape[0]) * 0.5
             inp_copy = input_data.numpy().copy().T
             inp_copy[i] += noise
             altered_inp = torch.from_numpy(inp_copy.T)
@@ -39,4 +39,8 @@ def perturbation(model, input_data, labels, error):
             results_final = model(altered_inp)
             loss_final = error(results_final, labels)
             ans.append((loss_final - loss_init).numpy())
-    return ans
+    return np.array(ans)
+
+
+def rank_weights(weights):
+    return weights.argsort()[::-1]

@@ -35,4 +35,4 @@ def train_model():
         error=error,
     )
 
-monte_carlo_simulation(500,DEVICE,INPUT_DIM,HIDDEN_DIM,OUTPUT_DIM,nn.ReLU)
+print(monte_carlo_simulation(10,DEVICE,INPUT_DIM,HIDDEN_DIM,OUTPUT_DIM,nn.ReLU))
