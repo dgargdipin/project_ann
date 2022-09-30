@@ -16,7 +16,7 @@ target_corr = [
 ]
 
 
-def generate_data(device):
+def generate_data_np():
     v1 = N(0, 1)
     v2 = N(0, 1)
     v3 = N(0, 1)
@@ -34,9 +34,13 @@ def generate_data(device):
     data = np.vstack((rv1, rv2, rv3, rv4, rv5, rv6)).T
     labels = data[:, -1]  # for last column
     inp_data = data[:, :-1]  # for all but last column
+    return inp_data, labels
+
+
+def convert_np_to_torch(device,inp_data,labels):
     inp_data = torch.from_numpy(inp_data).float()
     labels = torch.from_numpy(labels).float().unsqueeze(1)
-    if device=='cuda':
-        inp_data=inp_data.cuda()
-        labels=labels.cuda()
+    if device == "cuda":
+        inp_data = inp_data.cuda()
+        labels = labels.cuda()
     return inp_data, labels
