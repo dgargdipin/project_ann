@@ -5,8 +5,8 @@ class ANNModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, activation_fn_class):
         super(ANNModel, self).__init__()
         # Linear function 1: 784 --> 100
-        self.hidden_layer = nn.Linear(input_dim, hidden_dim + 1, bias=False)
-        self.output_layer = nn.Linear(hidden_dim + 1, output_dim, bias=False)
+        self.hidden_layer = nn.Linear(input_dim, hidden_dim, bias=False)
+        self.output_layer = nn.Linear(hidden_dim, output_dim, bias=False)
         self.activation_fn = activation_fn_class()
 
     def forward(self, x):
@@ -42,6 +42,6 @@ class ANNModel(nn.Module):
             loss_list.append(loss.data.cpu())
 
             # print loss
-            if iteration % 50 == 0:
+            if iteration % 100 == 0:
                 print("epoch {}, loss {}".format(iteration, loss.data))
         return loss_list

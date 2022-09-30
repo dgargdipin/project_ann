@@ -2,7 +2,13 @@ from generate_data import convert_np_to_torch, generate_data_np
 from model import ANNModel
 import torch
 import numpy as np
-from weights import connection_weight, garsons, perturbation, rank_weights
+from weights import (
+    connection_weight,
+    garsons,
+    perturbation,
+    rank_weights,
+    similarity_coefficient,
+)
 
 
 def monte_carlo_simulation(
@@ -12,10 +18,14 @@ def monte_carlo_simulation(
     hidden_dim,
     output_dim,
     activation_fn,
+    actual_importance,
     learning_rate=0.02,
     num_sample_rows=50,
 ):
-    connection_importance_list = []
+    connection_importance = {}
+    connection_importance["connection_weight"] = 0
+    connection_importance["garsons"] = 0
+    connection_importance["perturbation"] = 0
     for simulation in range(num_simulations):
         inp_data_np, labels_np = generate_data_np()
         random_rows = np.random.choice(
@@ -34,19 +44,23 @@ def monte_carlo_simulation(
         optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
 
         net.train_with_labels(
-            iterations=1000,
+            iterations=500,
             optimizer=optimizer,
             inp_data=input_data,
             labels=labels,
             error=error,
         )
-        connection_importance_curr = {}
-        connection_importance_curr["connection_weight"] = rank_weights(
-            connection_weight(net)
+        connection_importance["connection_weight"] += similarity_coefficient(
+            rank_weights(connection_weight(net)), actual_importance
         )
-        connection_importance_curr["garsons"] = rank_weights(garsons(net))
-        connection_importance_curr["perturbation"] = rank_weights(
-            perturbation(net, input_data, labels, error)
+        connection_importance["garsons"] += similarity_coefficient(
+            rank_weights(garsons(net)), actual_importance
         )
-        connection_importance_list.append(connection_importance_curr)
-    return connection_importance_list
+        connection_importance["perturbation"] += similarity_coefficient(
+            rank_weights(perturbation(net, input_data, labels, error)),
+            actual_importance,
+        )
+    connection_importance["connection_weight"] /= num_simulations
+    connection_importance["garsons"] /= num_simulations
+    connection_importance["perturbation"] /= num_simulations
+    return connection_importance

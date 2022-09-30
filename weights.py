@@ -43,4 +43,18 @@ def perturbation(model, input_data, labels, error):
 
 
 def rank_weights(weights):
-    return weights.argsort()[::-1]
+    return weights.argsort()[::-1] + 1
+
+
+def similarity_coefficient(arr1, arr2):
+    range_arr = np.max(arr1) - np.min(arr1)
+    assert len(arr1) == len(arr2)
+    index_arr1 = [0] * len(arr1)
+    index_arr2 = [0] * len(arr2)
+    for i in range(len(arr1)):
+        index_arr1[arr1[i] - 1] = i
+        index_arr2[arr2[i] - 1] = i
+    ans = 0
+    for i in range(len(arr1)):
+        ans += 1 - abs(index_arr1[i] - index_arr2[i]) / range_arr
+    return ans / len(arr1)

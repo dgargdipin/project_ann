@@ -9,6 +9,7 @@ from generate_data import (
 from montecarlo import monte_carlo_simulation
 from weights import connection_weight, garsons, perturbation
 from plots import save_losses
+from pprint import pprint
 
 INPUT_DIM = 5
 HIDDEN_DIM = 5
@@ -35,4 +36,9 @@ def train_model():
         error=error,
     )
 
-print(monte_carlo_simulation(10,DEVICE,INPUT_DIM,HIDDEN_DIM,OUTPUT_DIM,nn.ReLU))
+
+ans = monte_carlo_simulation(
+    20, DEVICE, INPUT_DIM, HIDDEN_DIM, OUTPUT_DIM, nn.ReLU, [1, 2, 3, 4, 5]
+)
+pprint("Connection importance values using different methods")
+pprint(ans)
